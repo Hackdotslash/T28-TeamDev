@@ -19,6 +19,7 @@ dependencies:
   page_transition: ^1.1.6
   bubble: ^1.1.9+1
   flutter_tts: ^2.1.0
+  video_player: ^1.0.1
   get_it: ^4.0.4
   flutter_keyboard_visibility: ^3.2.1
   provider: ^4.3.1

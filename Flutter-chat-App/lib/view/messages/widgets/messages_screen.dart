@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:bubble/bubble.dart';
+import 'package:video_player/video_player.dart';
 import '../../../service_locator.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -27,6 +28,8 @@ class MessagesScreen extends StatefulWidget {
 
 class _MessageScreenState extends State<MessagesScreen> {
   Future<List<Message>> messagesFuture;
+  VideoPlayerController _controller;
+  Future<void> _initializeVideoPlayerFuture;
   TextEditingController controller;
   DeviceData deviceData;
   bool showMessages = false;
