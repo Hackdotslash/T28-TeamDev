@@ -9,7 +9,7 @@ import 'package:chat/view/widgets/avatar_icon.dart';
 
 class MessagesHeader extends StatelessWidget {
   final User friend;
-  const MessagesHeader({Key key, @required this.friend}) : super(key: key);
+  const MessagesHeader({Key key, @required this.friend}) :  super(key: key);
 
   @override
   Widget build(BuildContext context) {
