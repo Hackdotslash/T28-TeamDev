@@ -28,7 +28,7 @@ class MessagesScreen extends StatefulWidget {
 
 class _MessageScreenState extends State<MessagesScreen> {
   Future<List<Message>> messagesFuture;
-  VideoPlayerController _controller;
+  VideoPlayerController video_controller;
   Future<void> _initializeVideoPlayerFuture;
   TextEditingController controller;
   DeviceData deviceData;
@@ -45,6 +45,10 @@ class _MessageScreenState extends State<MessagesScreen> {
   void initState() {
     messagesBloc = serviceLocator<MessagesBloc>();
     controller = TextEditingController();
+    video_controller = VideoPlayerController.asset('assets/images/talking_girl.mp4');
+    _initializeVideoPlayerFuture = video_controller.initialize();
+    video_controller.setLooping(true);
+
     super.initState();
   }
 
@@ -52,6 +56,7 @@ class _MessageScreenState extends State<MessagesScreen> {
   void dispose() {
     messagesBloc.close();
     controller.dispose();
+    video_controller.dispose();
     super.dispose();
   }
 
@@ -61,12 +66,17 @@ class _MessageScreenState extends State<MessagesScreen> {
         "data": 0,
         "message": "hi there"
       });
+      video_controller.play();
     });
+
     await flutterTts.setVolume(volume);
     await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(pitch);
     await flutterTts.setLanguage("en-Us");
     await flutterTts.speak("hi there");
+    if(video_controller.value.isPlaying){
+      video_controller.pause();
+    }
   }
 
   final messageInsert = TextEditingController();
@@ -89,6 +99,31 @@ class _MessageScreenState extends State<MessagesScreen> {
                 child:  Column(
                     children: <Widget>[
                       const WhiteFooter(),
+                      Container(
+                        color: Colors.white,
+                        margin: const EdgeInsets.all(10.0),
+                        width: 100.0,
+                        height: 100.0,
+                        child:  FutureBuilder(
+                          future: _initializeVideoPlayerFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              // If the VideoPlayerController has finished initialization, use
+                              // the data it provides to limit the aspect ratio of the video.
+                              return AspectRatio(
+                                aspectRatio: video_controller.value.aspectRatio,
+                                // Use the VideoPlayer widget to display the video.
+                                child: VideoPlayer(video_controller),
+                              );
+                            } else {
+                              // If the VideoPlayerController is still initializing, show a
+                              // loading spinner.
+                              return Center(child: CircularProgressIndicator());
+                            }
+                          },
+                        ),
+                      ),
+
                       Flexible(
                           child: ListView.builder(
                               reverse: true,
@@ -171,8 +206,8 @@ class _MessageScreenState extends State<MessagesScreen> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 CircleAvatar(
-                  backgroundImage: AssetImage(
-                      data == 0 ? "assets/bot.png" : "assets/user.png"),
+                  backgroundImage: NetworkImage(
+                      data == 0 ? "https://raw.githubusercontent.com/neon97/chatbot_dialogflow/master/assets/bot.png" : "https://raw.githubusercontent.com/neon97/chatbot_dialogflow/master/assets/user.png"),
                 ),
                 SizedBox(
                   width: 10.0,

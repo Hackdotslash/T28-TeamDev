@@ -46,6 +46,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/avatars/
+    - assets/images/takling_girl.mp4
   fonts:
     - family: Arial Rounded
       fonts:
