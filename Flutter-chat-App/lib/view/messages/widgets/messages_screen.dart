@@ -43,7 +43,6 @@ class _MessageScreenState extends State<MessagesScreen> {
     controller.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     deviceData = DeviceData.init(context);
@@ -60,10 +59,25 @@ class _MessageScreenState extends State<MessagesScreen> {
               Expanded(
                 child: BlocProvider<MessagesBloc>(
                   create: (context) =>
-                      messagesBloc..add(MessagesStartFetching(widget.friend)),
+                  messagesBloc..add(MessagesStartFetching(widget.friend)),
                   child: Stack(
                     children: <Widget>[
-                      const WhiteFooter()
+                      const WhiteFooter(),
+                      MessagesList(friend: widget.friend),
+                      BlocBuilder<MessagesBloc, MessagesState>(
+                        builder: (context, state) {
+                          return state is MessagesLoading
+                              ? const Center(child: CircleProgress())
+                              : state is MessagesLoadFailed &&
+                              state.failure is NetworkException
+                              ? TryAgain(
+                              doAction: () => context
+                                  .bloc<MessagesBloc>()
+                                  .add(MessagesStartFetching(
+                                  widget.friend)))
+                              : SizedBox.shrink();
+                        },
+                      )
                     ],
                   ),
                 ),

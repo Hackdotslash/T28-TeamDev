@@ -4,7 +4,6 @@ import 'package:chat/view/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chat/models/user.dart';
-import 'package:chat/view/messages/widgets/back_icon.dart';
 import 'package:chat/view/utils/device_config.dart';
 import 'package:chat/view/widgets/avatar_icon.dart';
 
@@ -26,7 +25,6 @@ class MessagesHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          BackIcon(),
           Row(
             children: [
               AvatarIcon(
