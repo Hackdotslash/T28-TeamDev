@@ -12,8 +12,8 @@ import 'package:chat/view/widgets/progress_indicator.dart';
 import 'package:chat/view/widgets/try_again_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:bubble/bubble.dart';
-
 import '../../../service_locator.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -30,6 +30,13 @@ class _MessageScreenState extends State<MessagesScreen> {
   TextEditingController controller;
   DeviceData deviceData;
   bool showMessages = false;
+
+  final FlutterTts flutterTts=FlutterTts();
+
+  double volume = 0.5;
+  double pitch = 1.0;
+  double rate = 0.5;
+
   MessagesBloc messagesBloc;
   @override
   void initState() {
@@ -52,6 +59,11 @@ class _MessageScreenState extends State<MessagesScreen> {
         "message": "hi there"
       });
     });
+    await flutterTts.setVolume(volume);
+    await flutterTts.setSpeechRate(rate);
+    await flutterTts.setPitch(pitch);
+    await flutterTts.setLanguage("en-Us");
+    await flutterTts.speak("hi there");
   }
 
   final messageInsert = TextEditingController();
