@@ -12,6 +12,7 @@ import 'package:chat/view/widgets/progress_indicator.dart';
 import 'package:chat/view/widgets/try_again_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:bubble/bubble.dart';
 
 import '../../../service_locator.dart';
 
@@ -43,6 +44,19 @@ class _MessageScreenState extends State<MessagesScreen> {
     controller.dispose();
     super.dispose();
   }
+
+  void response(query) async {
+    setState(() {
+      messsages.insert(0, {
+        "data": 0,
+        "message": "hi there"
+      });
+    });
+  }
+
+  final messageInsert = TextEditingController();
+  List<Map> messsages = List();
+
   @override
   Widget build(BuildContext context) {
     deviceData = DeviceData.init(context);
@@ -57,35 +71,106 @@ class _MessageScreenState extends State<MessagesScreen> {
             children: <Widget>[
               MessagesHeader(friend: widget.friend),
               Expanded(
-                child: BlocProvider<MessagesBloc>(
-                  create: (context) =>
-                  messagesBloc..add(MessagesStartFetching(widget.friend)),
-                  child: Stack(
+                child:  Column(
                     children: <Widget>[
                       const WhiteFooter(),
-                      MessagesList(friend: widget.friend),
-                      BlocBuilder<MessagesBloc, MessagesState>(
-                        builder: (context, state) {
-                          return state is MessagesLoading
-                              ? const Center(child: CircleProgress())
-                              : state is MessagesLoadFailed &&
-                              state.failure is NetworkException
-                              ? TryAgain(
-                              doAction: () => context
-                                  .bloc<MessagesBloc>()
-                                  .add(MessagesStartFetching(
-                                  widget.friend)))
-                              : SizedBox.shrink();
-                        },
+                      Flexible(
+                          child: ListView.builder(
+                              reverse: true,
+                              itemCount: messsages.length,
+                              itemBuilder: (context, index) => chat(
+                                  messsages[index]["message"].toString(),
+                                  messsages[index]["data"]))),
+                      Divider(
+                        height: 5.0,
+                        color: Colors.deepOrange,
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Flexible(
+                                child: TextField(
+                                  controller: messageInsert,
+                                  decoration: InputDecoration.collapsed(
+                                      hintText: "Send your message",
+                                      hintStyle: TextStyle(
+                                          fontWeight: FontWeight.bold, fontSize: 18.0)),
+                                )),
+                            Container(
+                              padding: EdgeInsets.only(
+                                  top: deviceData.screenHeight * 0.01,
+                                  bottom: deviceData.screenHeight * 0.01,
+                                  right: deviceData.screenWidth * 0.02),
+                              child: IconButton(
+
+                                  icon: Icon(
+                                    Icons.send,
+                                    color: kBackgroundButtonColor,
+                                    size: deviceData.screenWidth * 0.065,
+                                  ),
+                                  onPressed: () {
+                                    if (messageInsert.text.isEmpty) {
+                                      print("empty message");
+                                    } else {
+                                      setState(() {
+                                        messsages.insert(0,
+                                            {"data": 1, "message": messageInsert.text});
+                                      });
+                                      response(messageInsert.text);
+                                      messageInsert.clear();
+                                    }
+                                  }),
+                            )
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15.0,
                       )
                     ],
                   ),
                 ),
-              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  //for better one i have use the bubble package check out the pubspec.yaml
+
+  Widget chat(String message, int data) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Bubble(
+          radius: Radius.circular(15.0),
+          color: data == 0 ? Colors.deepOrange : Colors.orangeAccent,
+          elevation: 0.0,
+          alignment: data == 0 ? Alignment.topLeft : Alignment.topRight,
+          nip: data == 0 ? BubbleNip.leftBottom : BubbleNip.rightTop,
+          child: Padding(
+            padding: EdgeInsets.all(2.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircleAvatar(
+                  backgroundImage: AssetImage(
+                      data == 0 ? "assets/bot.png" : "assets/user.png"),
+                ),
+                SizedBox(
+                  width: 10.0,
+                ),
+                Flexible(
+                    child: Text(
+                      message,
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ))
+              ],
+            ),
+          )),
     );
   }
 }
